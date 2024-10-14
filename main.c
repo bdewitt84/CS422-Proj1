@@ -73,8 +73,15 @@ void interpretCommands(char* prompt) {
     large_token_buffer = str_filler(input, ";");
     for (int i = 0; large_token_buffer.command_list[i] != NULL; ++i) {
       small_token_buffer = str_filler (large_token_buffer.command_list[i], " ");
-      // process command
-      processCommandLine(&small_token_buffer);
+
+      // process command (behavior for out.txt)
+      if (processCommandLine(&small_token_buffer) == -1) {
+        free_command_line(&small_token_buffer);
+        break;
+      }
+
+      // process command (behavior for screenshot)
+      // processCommandLine(&small_token_buffer);
 
       // flush buffer to keep up with write
       fflush(stdout);
