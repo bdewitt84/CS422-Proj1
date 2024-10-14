@@ -15,16 +15,11 @@
 
 
 // Signatures
-void interactiveShell();
-
-void fileMode(char const *path);
+void interpretCommands(char* prompt);
 
 void usage(char const *argv[]);
 
 int processCommandLine(command_line const *cmd);
-
-
-int validateCommand(char *cmd, char *compare_str, int num_args, int expected_args);
 
 
 // Constants
@@ -34,10 +29,17 @@ int MAX_SIZE_INPUT = 1024;
 int main(int argc, char const *argv[]) {
   if (argc == 1) {
     // interactive shell mode
-    interactiveShell(stdin, STDOUT_FILENO);
+    char prompt[] = ">>>";
+    interpretCommands(prompt);
   }
   else if (argc == 3 && strcmp(argv[1], "-f") == 0) {
-    fileMode(argv[2]);
+    // file mode
+    char prompt[] = "";
+    freopen(argv[2], "r", stdin);
+    freopen("./output.txt", "w", stdout);
+    interpretCommands(prompt);
+    freopen("/dev/tty", "r", stdin);
+    freopen("/dev/tty", "w", stdout);
   }
   else {
     usage(argv);
@@ -45,13 +47,12 @@ int main(int argc, char const *argv[]) {
 	return 0;
 }
 
-void interactiveShell() {
+void interpretCommands(char* prompt) {
 
   char *input = NULL;
   size_t len = 0;
 
   // initial prompt
-  char prompt[] = ">>>";
   write(STDOUT_FILENO, prompt, strlen(prompt));
 
   while(getline (&input, &len, stdin) != -1) {
@@ -63,10 +64,8 @@ void interactiveShell() {
     }
 
     // tokenize input;
-
     command_line large_token_buffer;
     command_line small_token_buffer;
-
     int line_num = 0;
 
     large_token_buffer = str_filler(input, ";");
@@ -88,12 +87,6 @@ void interactiveShell() {
     // continue prompt
     write(STDOUT_FILENO, prompt, strlen(prompt));
   }
-}
-
-void fileMode(char const *path) {
-  // only accepts filenames
-  // all output written to ./output.txt
-  printf("fileMode()\n");
 }
 
 void usage(char const *argv[]) {
@@ -173,22 +166,9 @@ int processCommandLine(command_line const *cmd_line) {
   // command not supported
   else {
     char err[] = "Error! Unrecognized command: ";
-    write(STDOUT_FILENO, err, strlen(err));
-    write(STDOUT_FILENO, cmd, strlen(cmd));
-    write(STDOUT_FILENO, "\n", 2);
+    printf("%s%s\n", err, cmd);
     return -1;
   }
   return 0;
 }
 
-// not really necessary
-int validateCommand(char *cmd, char *compare_str, int num_args, int expected_args) {
-  char args_err[] = "!!!Error! Unsupported parameters for command: ";
-  if (strcmp(cmd, compare_str) == 0) {
-    if (num_args != expected_args) {
-      printf("%s%s\n", args_err, cmd);
-      return -1;
-    }
-  }
-  return 0;
-}
