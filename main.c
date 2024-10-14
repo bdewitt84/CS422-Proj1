@@ -27,6 +27,8 @@ int MAX_SIZE_INPUT = 1024;
 
 
 int main(int argc, char const *argv[]) {
+  // TODO: attempt to force printf to write imediately
+  setvbuf(stdout, NULL, _IONBF, 0);
   if (argc == 1) {
     // interactive shell mode
     char prompt[] = ">>>";
@@ -73,20 +75,20 @@ void interpretCommands(char* prompt) {
       small_token_buffer = str_filler (large_token_buffer.command_list[i], " ");
       // process command
       if (processCommandLine(&small_token_buffer) == -1){
+        free_command_line(&small_token_buffer);
         break;
       }
       // free small token buffer memory
       free_command_line(&small_token_buffer);
-      memset(&small_token_buffer, 0, 0);
     }
 
     // free large token buffer
     free_command_line(&large_token_buffer);
-    memset (&large_token_buffer, 0, 0);
 
     // continue prompt
     write(STDOUT_FILENO, prompt, strlen(prompt));
   }
+  free(input);
 }
 
 void usage(char const *argv[]) {
