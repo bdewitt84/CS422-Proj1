@@ -61,7 +61,7 @@ void interpretCommands(char* prompt) {
   
     // exit or process command
     if (strcmp(input, "exit\n") == 0) {
-      free(input);
+      // free(input);
       break;
     }
 
@@ -74,10 +74,11 @@ void interpretCommands(char* prompt) {
     for (int i = 0; large_token_buffer.command_list[i] != NULL; ++i) {
       small_token_buffer = str_filler (large_token_buffer.command_list[i], " ");
       // process command
-      if (processCommandLine(&small_token_buffer) == -1){
-        free_command_line(&small_token_buffer);
-        break;
-      }
+      processCommandLine(&small_token_buffer);
+
+      // flush buffer to keep up with write
+      fflush(stdout);
+
       // free small token buffer memory
       free_command_line(&small_token_buffer);
     }

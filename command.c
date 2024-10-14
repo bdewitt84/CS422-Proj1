@@ -14,6 +14,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <libgen.h> // basename
 
 void lineBreak() {
   write(STDOUT_FILENO, "\n", strlen("\n"));
@@ -78,10 +79,29 @@ void copyFile(char *sourcePath, char *destinationPath) { // cp
     return;
   }
 
+  // get stat of destination so we can check if it is a dir
+  struct stat statBuf;
+  if (stat(destinationPath, &statBuf) == -1) {
+    char msg[] = "Could not stat destination!\n";
+    write(STDOUT_FILENO, msg, strlen(msg));
+  }
+
+  // if dest is a dir, append filename to destination
+  char fullDestPath[1024];
+  if (S_ISDIR(statBuf.st_mode)) {
+    char *base = basename(sourcePath);
+    snprintf(fullDestPath, sizeof(fullDestPath), "%s/%s", destinationPath, base);
+  } 
+  else {
+  // otherwise just copy the original path
+    strcpy(fullDestPath, destinationPath);
+  }
+
   // attempt to open destination file
-  if ((destinationFile = open(destinationPath, O_WRONLY | O_CREAT | O_TRUNC, 0666)) == -1) {
+  if ((destinationFile = open(fullDestPath, O_WRONLY | O_CREAT | O_TRUNC, 0666)) == -1) {
     char msg[] = "Could not open destination file!\n";
     write(STDOUT_FILENO, msg, strlen(msg));
+    close(sourceFile);
     return;
   }
 
@@ -93,6 +113,7 @@ void copyFile(char *sourcePath, char *destinationPath) { // cp
     if (bytes_read != bytes_written) {
       char msg[] = "Error copying data!";
       write(STDOUT_FILENO, msg, strlen(msg));
+      // should probably close and return here
     }
   }
 
