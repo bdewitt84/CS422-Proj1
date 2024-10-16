@@ -81,21 +81,25 @@ void copyFile(char *sourcePath, char *destinationPath) { // cp
 
   // get stat of destination so we can check if it is a dir
   struct stat statBuf;
+
+  char fullDestPath[1024];
   if (stat(destinationPath, &statBuf) == -1) {
-    char msg[] = "Could not stat destination!\n";
-    write(STDOUT_FILENO, msg, strlen(msg));
+    // prevents checking of uninitialized val if stat fails
+    statBuf.st_mode = 0;
   }
 
-  // if dest is a dir, append filename to destination
-  char fullDestPath[1024];
+// if dest is a dir, append filename to destination
+  // TODO: Need to malloc here
   if (S_ISDIR(statBuf.st_mode)) {
-    char *base = basename(sourcePath);
+    //TODO: Basename may be responsible for mem leak
+    char* base = basename(sourcePath);
     snprintf(fullDestPath, sizeof(fullDestPath), "%s/%s", destinationPath, base);
   } 
   else {
   // otherwise just copy the original path
     strcpy(fullDestPath, destinationPath);
   }
+
 
   // attempt to open destination file
   if ((destinationFile = open(fullDestPath, O_WRONLY | O_CREAT | O_TRUNC, 0666)) == -1) {
@@ -156,6 +160,5 @@ void displayFile(char *filename) { // cat
     write(STDOUT_FILENO, buffer, bytes);
   }
   close(fd);
-  lineBreak();
 }
 

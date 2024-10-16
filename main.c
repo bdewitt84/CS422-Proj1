@@ -31,7 +31,7 @@ int main(int argc, char const *argv[]) {
   setvbuf(stdout, NULL, _IONBF, 0);
   if (argc == 1) {
     // interactive shell mode
-    char prompt[] = ">>>";
+    char prompt[] = ">>> ";
     interpretCommands(prompt);
   }
   else if (argc == 3 && strcmp(argv[1], "-f") == 0) {
@@ -75,13 +75,13 @@ void interpretCommands(char* prompt) {
       small_token_buffer = str_filler (large_token_buffer.command_list[i], " ");
 
       // process command (behavior for out.txt)
-      if (processCommandLine(&small_token_buffer) == -1) {
-        free_command_line(&small_token_buffer);
-        break;
-      }
+      //if (processCommandLine(&small_token_buffer) == -1) {
+      //  free_command_line(&small_token_buffer);
+      //  break;
+      //}
 
       // process command (behavior for screenshot)
-      // processCommandLine(&small_token_buffer);
+       processCommandLine(&small_token_buffer);
 
       // flush buffer to keep up with write
       fflush(stdout);
