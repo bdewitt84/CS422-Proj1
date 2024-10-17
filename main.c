@@ -75,10 +75,11 @@ void interpretCommands(char* prompt) {
       small_token_buffer = str_filler (large_token_buffer.command_list[i], " ");
 
       // process command (behavior for out.txt)
-      //if (processCommandLine(&small_token_buffer) == -1) {
-      //  free_command_line(&small_token_buffer);
-      //  break;
-      //}
+      // this is the behavior recommended by TA Albie
+      if (processCommandLine(&small_token_buffer) == -1) {
+        free_command_line(&small_token_buffer);
+        break;
+      }
 
       // process command (behavior for screenshot)
        processCommandLine(&small_token_buffer);
