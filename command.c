@@ -74,7 +74,7 @@ void copyFile(char *sourcePath, char *destinationPath) { // cp
 
   // attempt to open source file
   if ((sourceFile = open(sourcePath, O_RDONLY)) == -1) {
-    char msg[] = "Coud not open source file!\n";
+    char msg[] = "Could not open source file!\n";
     write(STDOUT_FILENO, msg, strlen(msg));
     return;
   }
@@ -88,10 +88,8 @@ void copyFile(char *sourcePath, char *destinationPath) { // cp
     statBuf.st_mode = 0;
   }
 
-// if dest is a dir, append filename to destination
-  // TODO: Need to malloc here
+  // if dest is a dir, append filename to destination
   if (S_ISDIR(statBuf.st_mode)) {
-    //TODO: Basename may be responsible for mem leak
     char* base = basename(sourcePath);
     snprintf(fullDestPath, sizeof(fullDestPath), "%s/%s", destinationPath, base);
   } 
@@ -127,7 +125,28 @@ void copyFile(char *sourcePath, char *destinationPath) { // cp
 }
 
 void moveFile(char *sourcePath, char *destinationPath) { // mv
-  if (rename(sourcePath, destinationPath) == -1) {
+
+  // get stat of destination so we can check if it is a dir
+  struct stat statBuf;
+
+  char fullDestPath[1024];
+  if (stat(destinationPath, &statBuf) == -1) {
+    statBuf.st_mode = 0;
+  }
+
+  // if dest is a dir, append filename to destination
+  if (S_ISDIR(statBuf.st_mode)) {
+    char* base = basename(sourcePath);
+    snprintf(fullDestPath, sizeof(fullDestPath), "%s/%s", destinationPath, base);
+  }
+  else {
+  // otherwise just copy the original path
+    strcpy(fullDestPath, destinationPath);
+  }
+
+  // move file
+  // if (rename(sourcePath, destinationPath) == -1) {
+  if (rename(sourcePath, fullDestPath) == -1) {
     char msg[] = "Could not move file!\n";
     write(STDOUT_FILENO, msg, strlen(msg));
   }
@@ -137,13 +156,12 @@ void deleteFile(char *filename) { // rm
   if (access(filename, F_OK) != 0) {
     char msg[] = "File does not exist!";
     write(STDOUT_FILENO, msg, strlen(msg));
-    lineBreak();
   }
   else if (unlink(filename) == -1) {
     char msg[] = "Could not delete file!";
     write(STDOUT_FILENO, msg, strlen(msg));
-    lineBreak();
   }
+  lineBreak();
 }
 
 void displayFile(char *filename) { // cat

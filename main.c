@@ -2,7 +2,7 @@
  * main.c
  *
  * Created on 10/12/2024
- * Authoer Brett DeWitt
+ * Author Brett DeWitt
  *
  */
 
@@ -109,7 +109,12 @@ int processCommandLine(command_line const *cmd_line) {
   int num_args = cmd_line->num_token;
   char args_err[] = "Error! Unsupported parameters for command: ";
 
-  if (strcmp(cmd, "ls") == 0) {
+  if (cmd == NULL) {
+    // check for null token
+    return -1;
+  }
+
+  else if (strcmp(cmd, "ls") == 0) {
     if (num_args != 1) {
       printf("%s%s\n",args_err, cmd);
       return -1;

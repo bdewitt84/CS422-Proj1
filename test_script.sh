@@ -316,7 +316,6 @@ exit
 EOF
     )
 
-    echo "This file will be removed." > "$FILE_TO_REMOVE"
     # Capture any valgrind memory errors or leaks
     mem_errors=$(echo "$valgrind_output" | grep 'ERROR SUMMARY:')
     leaks_detected=$(echo "$valgrind_output" | grep -Eo 'definitely lost: [^0]|indirectly lost: [^0]|possibly lost: [^0]|still reachable: [^0]')
