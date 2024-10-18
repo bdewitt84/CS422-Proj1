@@ -82,7 +82,7 @@ void interpretCommands(char* prompt) {
       }
 
       // process command (behavior for screenshot)
-       processCommandLine(&small_token_buffer);
+      // processCommandLine(&small_token_buffer);
 
       // flush buffer to keep up with write
       fflush(stdout);
@@ -112,7 +112,7 @@ int processCommandLine(command_line const *cmd_line) {
 
   if (cmd == NULL) {
     // check for null token
-    return -1;
+    return 0;
   }
 
   else if (strcmp(cmd, "ls") == 0) {
